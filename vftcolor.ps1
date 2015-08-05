@@ -14,7 +14,7 @@ if (($args.Length % 2) -ne 0) {
 
 for ($i = 0; $i -le $controllers.length-1; $i++) {
     $cont = Connect-NaController $controllers[$i] -Credential $cred -https
-    if ( !(Get-NaLicense -Controller $cont -Names multistore).Licensed ) {
+    if ( !(Get-NaLicense -Controller $cont -Name multistore).IsLicensed ) {
         Write-Host ""
         Write-Host "******************************************************************"
         Write-Host ("Controller: " + $cont.Name)
@@ -44,7 +44,6 @@ for ($i = 0; $i -le $controllers.length-1; $i++) {
                     $vf_running_exports = invoke-nassh -Controller $cont -Credential $cred -Command $command
                     $vf_running_exports = (($vf_running_exports -split "`n") | ? {$_ -match '^/vol/'} | sort-object) -join "`n"
                     Write-Host ""
-                    Write-Host "Exports in the running config"
                     $vf_running_exports
                     if ($exports -eq $vf_running_exports) {
                         Write-Host ""
@@ -56,6 +55,11 @@ for ($i = 0; $i -le $controllers.length-1; $i++) {
                         Write-Host "Controller: $($cont.Name) Vfiler: $($vfiler): /etc/exports file and the running config " -nonewline
                         Write-Host "DO NOT MATCH " -foregroundcolor red 
                         Write-Host ""
+						###Write-Host "Contents of /etc/exports file"
+						###$exports
+						###Write-Host "Contents of the running config"
+						###$vf_running_exports
+						###Write-Host ""
                     }
                 } else {
                     Write-Host ""
